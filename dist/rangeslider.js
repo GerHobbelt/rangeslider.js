@@ -39,6 +39,7 @@
         inputrange = supportsRange(),
         defaults = {
             polyfill: true,
+            orientation: 'horizontal',
             baseClass: 'rangeslider',
             rangeClass: 'rangeslider__range',
             fillClass: 'rangeslider__fill',
@@ -236,7 +237,13 @@
     };
 
     Plugin.prototype.getRelativePosition = function(node, e) {
-        return (e.pageX || (e.originalEvent.changedTouches && e.originalEvent.changedTouches[0].pageX) || 0) - this.getPositionFromNode(node);
+        var location = e.pageX || (e.originalEvent.changedTouches && e.originalEvent.changedTouches[0].pageX);
+
+        if (this.options.orientation === 'vertical') {
+            location = e.pageY || (e.originalEvent.changedTouches && e.originalEvent.changedTouches[0].pageY);
+        }
+
+        return (location || 0) - this.getPositionFromNode(node);
     };
 
     Plugin.prototype.getPositionFromValue = function(value) {

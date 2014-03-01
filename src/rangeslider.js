@@ -38,6 +38,7 @@
         inputrange = supportsRange(),
         defaults = {
             polyfill: true,
+            orientation: 'horizontal',
             baseClass: 'rangeslider',
             rangeClass: 'rangeslider__range',
             fillClass: 'rangeslider__fill',
@@ -168,7 +169,11 @@
         var posX = this.getRelativePosition(this.$base[0], e),
             handleX = this.getPositionFromNode(this.$handle[0]) - this.getPositionFromNode(this.$base[0]);
 
-        this.setPosition(posX - this.grabX);
+        if (this.options.orientation === 'horizontal') {
+            this.setPosition(posX - this.grabX);
+        } else {
+            this.setPosition(this.grabX - posX);
+        }
 
         if (posX >= handleX && posX < handleX + this.handleWidth) {
             this.grabX = posX - handleX;
@@ -178,7 +183,12 @@
     Plugin.prototype.handleMove = function(e) {
         e.preventDefault();
         var posX = this.getRelativePosition(this.$base[0], e);
-        this.setPosition(posX - this.grabX);
+
+        if (this.options.orientation === 'horizontal') {
+            this.setPosition(posX - this.grabX);
+        } else {
+            this.setPosition(this.grabX - posX);
+        }
     };
 
     Plugin.prototype.handleEnd = function(e) {
@@ -188,7 +198,11 @@
 
         var posX = this.getRelativePosition(this.$base[0], e);
         if (this.onSlideEnd && typeof this.onSlideEnd === 'function') {
-            this.onSlideEnd(posX - this.grabX, this.value);
+            if (this.options.orientation === 'horizontal') {
+                this.onSlideEnd(posX - this.grabX, this.value);
+            } else {
+                this.onSlideEnd(this.grabX - posX, this.value);
+            }
         }
     };
 
@@ -228,14 +242,24 @@
     Plugin.prototype.getPositionFromNode = function(node) {
         var i = 0;
         while (node !== null) {
-            i += node.offsetLeft;
+            if (this.options.orientation === 'horizontal') {
+                i += node.offsetLeft;
+            } else {
+                i += node.offsetTop;
+            }
             node = node.offsetParent;
         }
         return i;
     };
 
     Plugin.prototype.getRelativePosition = function(node, e) {
-        return (e.pageX || (e.originalEvent.changedTouches && e.originalEvent.changedTouches[0].pageX) || 0) - this.getPositionFromNode(node);
+        var location = e.pageX || (e.originalEvent.changedTouches && e.originalEvent.changedTouches[0].pageX);
+
+        if (this.options.orientation === 'vertical') {
+            location = e.pageY || (e.originalEvent.changedTouches && e.originalEvent.changedTouches[0].pageY);
+        }
+
+        return (location || 0) - this.getPositionFromNode(node);
     };
 
     Plugin.prototype.getPositionFromValue = function(value) {
