@@ -25,12 +25,7 @@
      * @return {Boolean}
      */
     function isTouchScreen() {
-        var bool = false,
-            DocumentTouch = DocumentTouch || {};
-        if(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
-            bool = true;
-        }
-        return bool;
+        return !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
     }
 
     var pluginName = 'rangeslider',
